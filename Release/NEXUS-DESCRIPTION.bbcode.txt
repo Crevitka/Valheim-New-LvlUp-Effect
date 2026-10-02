@@ -2,6 +2,11 @@
 [size=3]Minimal Nordic skill notifications for Valheim[/size]
 By Crevitka • Version 1.2.1[/center]
 
+[center][img]https://raw.githubusercontent.com/Crevitka/Valheim-New-LvlUp-Effect/master/docs/levelup.gif[/img]
+
+[b]Before / after[/b]
+[img]https://raw.githubusercontent.com/Crevitka/Valheim-New-LvlUp-Effect/master/docs/before-after.jpg[/img][/center]
+
 [b]Make each skill increase feel like a small reward.[/b]
 The old level slides up and the new number rises into its place with a subtle golden glow. A fine medallion, geometric ornament and a few fading embers keep the notification compact and readable.
 

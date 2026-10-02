@@ -6,6 +6,12 @@ By **Crevitka** · Version **1.2.1** · MIT License
 
 New LvlUp Effect replaces Valheim's standard skill-increase text with a compact Nordic notification. The old level slides upwards and the new number rises into its place, followed by a small golden glow.
 
+![New LvlUp Effect in game](https://raw.githubusercontent.com/Crevitka/Valheim-New-LvlUp-Effect/master/docs/levelup.gif)
+
+**Before / after:**
+
+![Vanilla skill-up text next to the New LvlUp Effect notification](https://raw.githubusercontent.com/Crevitka/Valheim-New-LvlUp-Effect/master/docs/before-after.jpg)
+
 ## Features
 
 - Animated level replacement in one position, such as **5 → 6**.

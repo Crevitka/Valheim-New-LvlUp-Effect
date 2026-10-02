@@ -6,6 +6,12 @@
 
 Навыки и баланс не меняются. Штатные звук и эффекты сохраняются. Названия навыков берутся из локализации игры. Мод устанавливается только на клиент; серверу он не нужен. Jotunn не требуется.
 
+![New LvlUp Effect в игре](https://raw.githubusercontent.com/Crevitka/Valheim-New-LvlUp-Effect/master/docs/levelup.gif)
+
+**До / после:**
+
+![Штатная надпись о навыке рядом с уведомлением New LvlUp Effect](https://raw.githubusercontent.com/Crevitka/Valheim-New-LvlUp-Effect/master/docs/before-after.jpg)
+
 ## Установка
 
 Нужен BepInExPack Valheim 5.4.2202 или более новая совместимая сборка BepInEx 5.
