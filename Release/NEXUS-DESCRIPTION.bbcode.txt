@@ -1,0 +1,57 @@
+[center][size=6][b]New LvlUp Effect[/b][/size]
+[size=3]Minimal Nordic skill notifications for Valheim[/size]
+By Crevitka • Version 1.2.1[/center]
+
+[b]Make each skill increase feel like a small reward.[/b]
+The old level slides up and the new number rises into its place with a subtle golden glow. A fine medallion, geometric ornament and a few fading embers keep the notification compact and readable.
+
+[size=4][b]Features[/b][/size]
+[list]
+[*]Animated replacement of the previous level by the new one, such as 5 → 6.
+[*]Native skill icons, font and localized names.
+[*]Vanilla progression, sounds and world effects preserved.
+[*]Adjustable position, size and duration.
+[*]Queued notifications for multiple increases.
+[*]Support for normal skill gains and the raiseskill console command.
+[*]Preview command without changing your character.
+[/list]
+
+[size=4][b]Requirements[/b][/size]
+Valheim for PC and [url=https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/]BepInExPack Valheim[/url] 5.4.2202 or a newer compatible BepInEx 5 build.
+Client-side only. No server installation or Jotunn required.
+Local build and runtime logging checked with Valheim 1.0.15 and BepInExPack 5.4.2202.
+
+[size=4][b]Installation[/b][/size]
+1. Install BepInExPack Valheim and launch the game once.
+2. Extract the archive and merge its BepInEx folder into the game folder containing valheim.exe.
+3. Restart the game.
+Final location: BepInEx/plugins/NewLvlUpEffect/NewLvlUpEffect.dll
+Do not install multiple copies of the DLL.
+
+[size=4][b]Preview the animation[/b][/size]
+Enable the console with the -console launch option, enter a world and run this in F5:
+[code]newlvlupeffect_preview[/code]
+[b]Close F5 to see the animation.[/b] The preview shows Running changing from 5 to 6. It does not change your skills and does not require devcommands.
+
+[size=4][b]Configuration[/b][/size]
+Created on first launch: BepInEx/config/local.valheim.newlvlupeffect.cfg
+Restart after editing.
+[list]
+[*]Enabled — toggle notifications; default true.
+[*]ReplaceVanillaMessage — hide original skill-up HUD text, including raiseskill; console output is preserved. Default true.
+[*]Duration — 1.5–8 seconds; default 3.6.
+[*]VerticalPosition — height from the bottom, 0.2–0.9; default 0.77.
+[*]Scale — 0.6–1.5; default 1.
+[/list]
+
+[size=4][b]Compatibility and troubleshooting[/b][/size]
+Other skill notification mods may cause duplicate messages. Older game releases, Linux, Steam Deck and custom skill systems have not been verified. The normal console output from raiseskill is preserved.
+Repeated waiting notifications for the same skill are combined. The waiting queue is limited to 32 entries. Multi-level gains animate directly to the final level. Timers pause while the console is open.
+
+If nothing appears, close F5, restart the game and check Enabled in the configuration. Check BepInEx/LogOutput.log for the plugin version and Showing messages. Include relevant log lines and your versions when reporting an issue; remove personal information first.
+
+[size=4][b]Update / uninstall[/b][/size]
+Close the game and replace the old DLL to update. Configuration is retained. Remove the DLL to uninstall; no save migration is required.
+
+[size=4][b]Credits and permissions[/b][/size]
+Created by Crevitka with AI-assisted development and documentation. MIT License; see LICENSE in the archive. Game assets are read at runtime and are not distributed. Unofficial mod for Valheim by Iron Gate.

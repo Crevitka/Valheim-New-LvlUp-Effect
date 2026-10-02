@@ -1,0 +1,7 @@
+{
+  "name": "New_LvlUp_Effect",
+  "version_number": "1.2.1",
+  "website_url": "https://github.com/Crevitka/Valheim-New-LvlUp-Effect",
+  "description": "Minimal Nordic skill level-up notifications with rolling numbers, golden light and subtle ornament. Client-side. Keeps vanilla skill progression, sounds and effects.",
+  "dependencies": ["denikson-BepInExPack_Valheim-5.4.2202"]
+}
