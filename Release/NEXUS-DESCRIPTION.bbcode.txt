@@ -58,5 +58,14 @@ If nothing appears, close F5, restart the game and check Enabled in the configur
 [size=4][b]Update / uninstall[/b][/size]
 Close the game and replace the old DLL to update. Configuration is retained. Remove the DLL to uninstall; no save migration is required.
 
+[size=4][b]Links[/b][/size]
+[list]
+[*][b]GitHub:[/b] [url=https://github.com/Crevitka/Valheim-New-LvlUp-Effect]github.com/Crevitka/Valheim-New-LvlUp-Effect[/url] — source code, issues
+[*][b]Discord:[/b] [url=https://discord.gg/F2UehNhe96]discord.gg/F2UehNhe96[/url] — support and feedback
+[*][b]Reddit:[/b] [url=https://www.reddit.com/user/Crevitka/]reddit.com/user/Crevitka[/url]
+[*][b]X:[/b] [url=https://x.com/Crevitka]x.com/Crevitka[/url]
+[/list]
+Questions, bug reports and ideas are welcome on Discord or in GitHub issues.
+
 [size=4][b]Credits and permissions[/b][/size]
 Created by Crevitka with AI-assisted development and documentation. MIT License; see LICENSE in the archive. Game assets are read at runtime and are not distributed. Unofficial mod for Valheim by Iron Gate.

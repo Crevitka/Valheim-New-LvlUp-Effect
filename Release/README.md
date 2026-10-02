@@ -86,6 +86,15 @@ For a bug report, include your game version, BepInEx version, mod version, relev
 
 Close the game and replace the previous DLL. Existing configuration is retained. To uninstall, remove the mod's DLL or uninstall it through your manager. The configuration can optionally be removed too. No save migration is needed.
 
+## Links
+
+- **GitHub:** [github.com/Crevitka/Valheim-New-LvlUp-Effect](https://github.com/Crevitka/Valheim-New-LvlUp-Effect) — source code, issues
+- **Discord:** [discord.gg/F2UehNhe96](https://discord.gg/F2UehNhe96) — support and feedback
+- **Reddit:** [reddit.com/user/Crevitka](https://www.reddit.com/user/Crevitka/)
+- **X:** [x.com/Crevitka](https://x.com/Crevitka)
+
+Questions, bug reports and ideas are welcome on Discord or in GitHub issues.
+
 ## Credits and license
 
 Created by **Crevitka**, with AI-assisted development and documentation. Distributed under the **MIT License**; see `LICENSE`. Game icons and fonts are accessed from the installed game at runtime and are not redistributed. Valheim is developed by Iron Gate; this is an unofficial mod.

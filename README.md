@@ -99,6 +99,15 @@ Requires Windows, a .NET SDK, Valheim and BepInExPack Valheim.
 
 Without parameters the build uses the default Steam path. Game, Unity and BepInEx assemblies are only referenced from your installation and are not included in this repository. See [Release/SOURCE-README.md](Release/SOURCE-README.md) for implementation notes.
 
+## Links
+
+- **GitHub:** [github.com/Crevitka/Valheim-New-LvlUp-Effect](https://github.com/Crevitka/Valheim-New-LvlUp-Effect) — source code, issues
+- **Discord:** [discord.gg/F2UehNhe96](https://discord.gg/F2UehNhe96) — support and feedback
+- **Reddit:** [reddit.com/user/Crevitka](https://www.reddit.com/user/Crevitka/)
+- **X:** [x.com/Crevitka](https://x.com/Crevitka)
+
+Questions, bug reports and ideas are welcome on Discord or in GitHub issues.
+
 ## Credits and license
 
 Created by **Crevitka**, with AI-assisted development and documentation. Distributed under the **MIT License**; see [LICENSE](LICENSE). Game icons and fonts are accessed from the installed game at runtime and are not redistributed. Valheim is developed by Iron Gate; this is an unofficial mod.

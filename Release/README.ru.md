@@ -55,3 +55,12 @@ newlvlupeffect_preview
 Для обновления закрой игру и замени DLL. Для удаления убери DLL или удали мод через менеджер. Настройки при обновлении сохраняются.
 
 Разработано с помощью ИИ. Иконки и шрифт игры используются во время работы, но не включены в архив. Неофициальный мод для Valheim.
+
+## Ссылки
+
+- **GitHub:** [github.com/Crevitka/Valheim-New-LvlUp-Effect](https://github.com/Crevitka/Valheim-New-LvlUp-Effect) — исходники и баг-репорты
+- **Discord:** [discord.gg/F2UehNhe96](https://discord.gg/F2UehNhe96) — поддержка и обратная связь
+- **Reddit:** [reddit.com/user/Crevitka](https://www.reddit.com/user/Crevitka/)
+- **X:** [x.com/Crevitka](https://x.com/Crevitka)
+
+Вопросы, баг-репорты и идеи — в Discord или в issues на GitHub.
