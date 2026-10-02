@@ -5,8 +5,10 @@
 Requires Python 3 with Pillow and numpy. Inputs live in Release/Artwork/src:
 scene.jpg (an in-game 2560x1440 capture of the notification) and Gelasio.ttf
 (SIL Open Font License, see Gelasio-OFL.txt). Outputs:
-  icon.png                    256x256 Thunderstore icon
-  Artwork/icon-master.png     1024x1024 icon master
+  Artwork/icon-master.png     1024x1024 medallion icon (dark background)
+  Artwork/icon-medallion-256.png  256x256 medallion icon
+Release/icon.png (the Thunderstore icon) is hand-made from Media/New LvlUp Effect.png
+and is not touched by this script.
   Artwork/cover.png           1600x900 Nexus/GitHub cover
   Artwork/header.png          1300x372 Nexus header (header@2x.png 2600x744)
 """
@@ -97,7 +99,7 @@ def banner(scene, W, H, plaque_x, title, sub, chip, src_w, chips=True):
 if __name__ == "__main__":
     icon = medallion(1024).convert("RGB")
     icon.save(os.path.join(ART, "icon-master.png"))
-    icon.resize((256, 256), Image.LANCZOS).save(os.path.join(HERE, "icon.png"))
+    icon.resize((256, 256), Image.LANCZOS).save(os.path.join(ART, "icon-medallion-256.png"))
     scene = Image.open(os.path.join(SRC, "scene.jpg")).convert("RGB")
     banner(scene, 1600, 900, 0.70, 118, 30, 22, 1120).save(os.path.join(ART, "cover.png"))
     h = banner(scene, 2600, 744, 0.72, 150, 40, 0, 1700, chips=False)
