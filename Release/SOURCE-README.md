@@ -1,6 +1,6 @@
 # New LvlUp Effect — source
 
-Author: Crevitka. MIT License. Version 1.2.1.
+Author: Crevitka. MIT License. Version 1.3.0.
 
 ## Build
 

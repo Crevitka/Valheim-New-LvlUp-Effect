@@ -2,7 +2,7 @@
 
 **A quieter, more expressive way to celebrate your skills.**
 
-By **Crevitka** · Version **1.2.1** · MIT License
+By **Crevitka** · Version **1.3.0** · MIT License
 
 New LvlUp Effect replaces Valheim's standard skill-increase text with a compact Nordic notification. The old level slides upwards and the new number rises into its place, followed by a small golden glow.
 
@@ -50,6 +50,8 @@ Add `-console` to Valheim's launch options. Enter a world, open F5, run:
 
 ```text
 newlvlupeffect_preview
+newlvlupeffect_preview fortify
+newlvlupeffect_preview character
 ```
 
 **Close F5 to start the animation.** The preview shows Running changing from 5 to 6 without modifying the character. No `devcommands` are required for this preview. The notification timer pauses while the console is open.
@@ -65,6 +67,9 @@ After the first launch, edit `BepInEx/config/local.valheim.newlvlupeffect.cfg`, 
 | Appearance.Duration | 3.6 | Duration in seconds; 1.5–8 |
 | Appearance.VerticalPosition | 0.77 | Height from the bottom; 0.2–0.9 |
 | Appearance.Scale | 1 | Notification size; 0.6–1.5 |
+| Appearance.NumberEasing | Exponential | Level number motion: Exponential, Smooth or Back |
+| Integrations.FortifySkillsRedux | true | Restyle FortifySkillsRedux "Fortified skill improved" messages |
+| Integrations.BetterUICharacterLevel | true | Restyle the BetterUI (Zenox) character level-up message |
 
 ## Compatibility and limitations
 
@@ -74,11 +79,13 @@ After the first launch, edit `BepInEx/config/local.valheim.newlvlupeffect.cfg`, 
 - Large increases animate directly from the previous to the final level.
 - Up to 32 notifications can wait in the queue; the oldest waiting entry is dropped if that limit is exceeded.
 - Notifications are cleared when leaving the world or changing the local player.
+- **FortifySkillsRedux:** fortified level-ups appear in the same style with a FORTIFIED heading and a frost accent.
+- **BetterUI (Zenox):** the character level-up appears in the same style with a LEVEL UP heading. BetterUI's own sound and effect still play.
 - The ordinary gameplay path is designed for vanilla skills. Compatibility with custom skill systems has not been verified.
 
 ## Troubleshooting
 
-If nothing appears, restart the game, close the console after the preview command and check that `Enabled = true`. Check `BepInEx/LogOutput.log` for `Loading [New LvlUp Effect 1.2.1]`, `Queued raiseskill notification` or `Showing` messages.
+If nothing appears, restart the game, close the console after the preview command and check that `Enabled = true`. Check `BepInEx/LogOutput.log` for `Loading [New LvlUp Effect 1.3.0]`, `Queued raiseskill notification` or `Showing` messages.
 
 For a bug report, include your game version, BepInEx version, mod version, relevant log lines and a short description of how to reproduce it. Redact account names, server addresses and other personal details before sharing logs.
 

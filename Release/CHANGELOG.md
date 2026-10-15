@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0
+
+- Fix TextMeshPro font warnings in the log: the notification is now built while inactive and every label gets the game font before TextMeshPro starts, so it no longer looks for the missing default LiberationSans SDF asset.
+- New `Appearance.NumberEasing` option: `Exponential` (new default: fast start, soft landing), `Smooth` (1.2 behaviour) or `Back` (slight overshoot).
+- FortifySkillsRedux support: "Fortified skill improved" messages are shown in the same style with a FORTIFIED heading and a frost accent (`Integrations.FortifySkillsRedux`).
+- BetterUI (Zenox) support: the character level-up message is shown in the same style with a LEVEL UP heading, the player name and a rank chevron (`Integrations.BetterUICharacterLevel`).
+- `newlvlupeffect_preview` accepts `skill`, `fortify` or `character`.
+
 ## 1.2.1
 
 - Rename the mod to New LvlUp Effect (plugin ID `local.valheim.newlvlupeffect`, console command `newlvlupeffect_preview`, DLL `NewLvlUpEffect.dll`).

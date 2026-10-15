@@ -1,4 +1,4 @@
-# New LvlUp Effect — 1.2.1
+# New LvlUp Effect — 1.3.0
 
 Автор: **Crevitka**. Лицензия: **MIT**.
 
@@ -30,6 +30,8 @@
 
 ```text
 newlvlupeffect_preview
+newlvlupeffect_preview fortify
+newlvlupeffect_preview character
 ```
 
 Закрой F5: появится пример «Бег, 5 → 6». Навык не изменяется; `devcommands` для предпросмотра не нужен. Пока консоль открыта, анимация приостановлена.
@@ -43,14 +45,17 @@ newlvlupeffect_preview
 - `Duration = 3.6`: длительность в секундах (1.5–8).
 - `VerticalPosition = 0.77`: положение по высоте, считая снизу (0.2–0.9).
 - `Scale = 1`: размер (0.6–1.5).
+- `NumberEasing = Exponential`: движение цифры уровня — `Exponential` (быстрый старт и мягкая посадка), `Smooth` (как в 1.2) или `Back` (лёгкий перелёт).
+- `[Integrations] FortifySkillsRedux = true`: показывать «Fortified skill improved» из FortifySkillsRedux в этом стиле.
+- `[Integrations] BetterUICharacterLevel = true`: показывать повышение уровня персонажа из BetterUI (Zenox) в этом стиле.
 
 Одновременные повышения идут по очереди. Повторные ожидающие уведомления одного навыка объединяются. Очередь ограничена 32 записями. При `raiseskill` показывается реальный переход от старого уровня к новому, если целая часть уровня выросла.
 
 ## Совместимость
 
-Другие моды уведомлений могут дублировать сообщения. Старые версии игры, Linux, Steam Deck и нестандартные системы навыков не проверены. Обычный вывод `raiseskill` сохранён.
+Поддерживаются FortifySkillsRedux (укреплённые уровни с пометкой FORTIFIED) и уровень персонажа из BetterUI от Zenox (LEVEL UP). Другие моды уведомлений могут дублировать сообщения. Старые версии игры, Linux, Steam Deck и нестандартные системы навыков не проверены. Обычный вывод `raiseskill` сохранён.
 
-Для диагностики смотри `BepInEx/LogOutput.log`: сообщения `Loading [New LvlUp Effect 1.2.1]`, `Queued raiseskill notification` и `Showing`. Перед отправкой журнала убери личные данные.
+Для диагностики смотри `BepInEx/LogOutput.log`: сообщения `Loading [New LvlUp Effect 1.3.0]`, `Queued raiseskill notification` и `Showing`. Перед отправкой журнала убери личные данные.
 
 Для обновления закрой игру и замени DLL. Для удаления убери DLL или удали мод через менеджер. Настройки при обновлении сохраняются.
 

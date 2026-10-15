@@ -12,18 +12,23 @@ using UnityEngine.UI;
 [assembly: System.Reflection.AssemblyDescription("Minimal Nordic skill level notifications for Valheim")]
 [assembly: System.Reflection.AssemblyCompany("Crevitka")]
 [assembly: System.Reflection.AssemblyCopyright("Copyright (c) 2026 Crevitka")]
-[assembly: System.Reflection.AssemblyVersion("1.2.1.0")]
-[assembly: System.Reflection.AssemblyFileVersion("1.2.1.0")]
+[assembly: System.Reflection.AssemblyVersion("1.3.0.0")]
+[assembly: System.Reflection.AssemblyFileVersion("1.3.0.0")]
 
 namespace NewLvlUpEffect
 {
-    [BepInPlugin(Id, "New LvlUp Effect", "1.2.1")]
+    public enum NumberEasing { Exponential, Smooth, Back }
+
+    [BepInPlugin(Id, "New LvlUp Effect", "1.3.0")]
     public sealed class Plugin : BaseUnityPlugin
     {
         public const string Id = "local.valheim.newlvlupeffect";
         internal static Plugin Instance;
         internal ConfigEntry<bool> Enabled, ReplaceVanilla;
         internal ConfigEntry<float> Duration, VerticalPosition, Scale;
+        internal ConfigEntry<NumberEasing> Easing;
+        internal ConfigEntry<bool> FortifySkills, BetterUILevel;
+        private int lastCharacterLevel = -1;
         private Harmony harmony;
         private LevelUpView view;
         private Player owner;
@@ -38,14 +43,23 @@ namespace NewLvlUpEffect
             Duration = Config.Bind("Appearance", "Duration", 3.6f, new ConfigDescription("Seconds per notification.", new AcceptableValueRange<float>(1.5f, 8f)));
             VerticalPosition = Config.Bind("Appearance", "VerticalPosition", .77f, new ConfigDescription("Vertical screen anchor: 0 bottom, 1 top.", new AcceptableValueRange<float>(.2f, .9f)));
             Scale = Config.Bind("Appearance", "Scale", 1f, new ConfigDescription("Notification scale.", new AcceptableValueRange<float>(.6f, 1.5f)));
+            Easing = Config.Bind("Appearance", "NumberEasing", NumberEasing.Exponential, "How the new level number moves into place: Exponential (fast start, soft landing), Smooth (1.2 behaviour) or Back (slight overshoot).");
+            FortifySkills = Config.Bind("Integrations", "FortifySkillsRedux", true, "Show FortifySkillsRedux 'Fortified skill improved' messages in this style.");
+            BetterUILevel = Config.Bind("Integrations", "BetterUICharacterLevel", true, "Show the character level-up message of BetterUI (Zenox) in this style.");
             harmony = new Harmony(Id);
             harmony.PatchAll();
-            new Terminal.ConsoleCommand("newlvlupeffect_preview", "Preview skill notification without changing skills.", (Terminal.ConsoleEvent)(args =>
+            new Terminal.ConsoleCommand("newlvlupeffect_preview", "Preview a notification without changing anything: [skill|fortify|character]", (Terminal.ConsoleEvent)(args =>
             {
-                if (Player.m_localPlayer != null && EnsureView())
+                if (Player.m_localPlayer == null || !EnsureView()) return;
+                string kind = args.Length > 1 ? args[1].ToLowerInvariant() : "skill";
+                if (kind == "fortify")
+                    view.EnqueueFortified(Localization.instance.Localize("$skill_run"), SkillIcon(Skills.SkillType.Run), 6);
+                else if (kind == "character")
+                    view.EnqueueCharacter(Player.m_localPlayer.GetPlayerName(), 12, 11);
+                else
                     view.Enqueue(Skills.SkillType.Run, 6, 5);
             }));
-            Logger.LogInfo("New LvlUp Effect 1.2.1 ready (animated level replacement).");
+            Logger.LogInfo("New LvlUp Effect 1.3.0 ready (animated level replacement).");
         }
 
         private bool EnsureView()
@@ -58,18 +72,61 @@ namespace NewLvlUpEffect
                 ?? fonts.FirstOrDefault();
             if (font == null) return false;
             var root = new GameObject("NewLvlUpEffect", typeof(RectTransform));
+            // Build while inactive: TextMeshPro runs Awake only on activation, so every
+            // label already has the game font and TMP never looks for its missing
+            // default font asset (which logged warnings in 1.2.x).
+            root.SetActive(false);
             // A nested Canvas inherits the HUD's rect and scaling. CanvasScaler
             // only drives root canvases, so keep this overlay at scene root.
             try
             {
                 var candidate = root.AddComponent<LevelUpView>();
                 candidate.Build(font, this);
+                root.SetActive(true);
                 view = candidate;
             }
             catch { Destroy(root); throw; }
             owner = Player.m_localPlayer;
             ownerHud = Hud.instance;
             return true;
+        }
+
+        internal static Sprite SkillIcon(Skills.SkillType skill)
+        {
+            var player = Player.m_localPlayer;
+            var entry = player == null ? null : player.GetSkills().m_skills.FirstOrDefault(s => s.m_skill == skill);
+            return entry == null ? null : entry.m_icon;
+        }
+
+        private static readonly System.Text.RegularExpressions.Regex FortifiedMessage =
+            new System.Text.RegularExpressions.Regex(@"^Fortified skill improved (.+?): (\d+)\s*$");
+        private static readonly System.Text.RegularExpressions.Regex BetterUILevelMessage =
+            new System.Text.RegularExpressions.Regex(@"LEVEL UP\s*You are now Lv\.\s*(\d+)");
+        private static readonly System.Text.RegularExpressions.Regex RichText =
+            new System.Text.RegularExpressions.Regex("<[^>]*>");
+
+        // Messages from other mods that we restyle. Returns true when handled.
+        private bool TryHandleModMessage(string msg, Sprite icon)
+        {
+            if (FortifySkills.Value && msg.StartsWith("Fortified skill improved ", StringComparison.Ordinal))
+            {
+                var m = FortifiedMessage.Match(msg);
+                int level;
+                if (!m.Success || !int.TryParse(m.Groups[2].Value, out level) || !EnsureView()) return false;
+                view.EnqueueFortified(m.Groups[1].Value, icon, level);
+                return true;
+            }
+            if (BetterUILevel.Value && msg.IndexOf("You are now Lv.", StringComparison.Ordinal) >= 0)
+            {
+                var m = BetterUILevelMessage.Match(RichText.Replace(msg, " "));
+                int level;
+                if (!m.Success || !int.TryParse(m.Groups[1].Value, out level) || !EnsureView()) return false;
+                int previous = lastCharacterLevel > 0 && lastCharacterLevel < level ? lastCharacterLevel : level - 1;
+                lastCharacterLevel = level;
+                view.EnqueueCharacter(Player.m_localPlayer.GetPlayerName(), level, previous);
+                return true;
+            }
+            return false;
         }
 
         private void Update()
@@ -94,11 +151,20 @@ namespace NewLvlUpEffect
         [HarmonyPatch(typeof(Player), "Message")]
         private static class SkillMessagePatch
         {
-            private static bool Prefix(Player __instance, string __1)
+            private static bool Prefix(Player __instance, string __1, Sprite __3)
             {
                 var plugin = Instance;
-                if (plugin == null || !plugin.Enabled.Value || !plugin.ReplaceVanilla.Value ||
-                    __instance != Player.m_localPlayer || __1 == null) return true;
+                if (plugin == null || !plugin.Enabled.Value || __instance != Player.m_localPlayer || __1 == null) return true;
+                try
+                {
+                    if (plugin.TryHandleModMessage(__1, __3)) return false;
+                }
+                catch (Exception error)
+                {
+                    plugin.Logger.LogError(error);
+                    return true;
+                }
+                if (!plugin.ReplaceVanilla.Value) return true;
                 bool skillMessage = __1.StartsWith("$msg_skillup $skill_", StringComparison.Ordinal) ||
                     __1.StartsWith("Skill increased ", StringComparison.Ordinal) ||
                     __1.StartsWith("All skills increased by ", StringComparison.Ordinal);
@@ -177,7 +243,15 @@ namespace NewLvlUpEffect
 
     public sealed class LevelUpView : MonoBehaviour
     {
-        private sealed class Notice { public Skills.SkillType Skill; public int Level; public int Previous; }
+        private sealed class Notice
+        {
+            public string Key, Heading, Title;
+            public Sprite Icon;
+            public int Level, Previous;
+            public Color Accent;
+            public bool Chevron;
+        }
+        private static readonly Color Frost = new Color(.62f, .84f, 1f);
         private readonly List<Notice> queue = new List<Notice>();
         private readonly List<Image> sparks = new List<Image>();
         private readonly List<Sprite> ownedSprites = new List<Sprite>();
@@ -186,6 +260,7 @@ namespace NewLvlUpEffect
         private CanvasGroup group, words, crest;
         private TextMeshProUGUI heading, title, number, subtitle;
         private Image icon, halo, flare, levelGlow;
+        private RectTransform chevron;
         private TMP_FontAsset font;
         private Notice current;
         private float elapsed;
@@ -239,6 +314,14 @@ namespace NewLvlUpEffect
             }
             icon = Box("Skill icon", medallion, new Vector2(45, 45), Vector2.zero, new Color(1, .94f, .8f));
             icon.preserveAspect = true;
+            chevron = Rect("Rank chevron", medallion, new Vector2(40, 40), Vector2.zero);
+            for (int row = 0; row < 2; row++)
+            {
+                float y = -6 + row * 11;
+                Stroke(chevron, new Vector2(-12, y - 7), new Vector2(0, y + 5), 1f, 2.2f);
+                Stroke(chevron, new Vector2(12, y - 7), new Vector2(0, y + 5), 1f, 2.2f);
+            }
+            chevron.gameObject.SetActive(false);
 
             ornament = Rect("Unfolding ornament", card, new Vector2(420, 12), new Vector2(0, 72));
             for (int side = -1; side <= 1; side += 2)
@@ -277,10 +360,71 @@ namespace NewLvlUpEffect
 
         public void Enqueue(Skills.SkillType skill, int level, int previous = -1)
         {
-            var pending = queue.FirstOrDefault(n => n.Skill == skill);
-            if (pending != null) { pending.Level = Math.Max(pending.Level, level); return; }
+            Add(new Notice
+            {
+                Key = "skill:" + skill,
+                Heading = Localization.instance.Localize("$msg_skillup").ToUpperInvariant(),
+                Title = Localization.instance.Localize("$skill_" + skill.ToString().ToLowerInvariant()),
+                Icon = Plugin.SkillIcon(skill),
+                Level = level,
+                Previous = previous < 0 ? Math.Max(0, level - 1) : previous,
+                Accent = Gold,
+            });
+        }
+
+        public void EnqueueFortified(string skillName, Sprite skillIcon, int level)
+        {
+            Add(new Notice
+            {
+                Key = "fortify:" + skillName,
+                Heading = "FORTIFIED",
+                // FortifySkillsRedux sends the raw token (e.g. "$skill_jump"); MessageHud
+                // would localize it on display, so do the same here.
+                Title = Localization.instance.Localize(skillName),
+                Icon = skillIcon,
+                Level = level,
+                Previous = Math.Max(0, level - 1),
+                Accent = Frost,
+            });
+        }
+
+        public void EnqueueCharacter(string playerName, int level, int previous)
+        {
+            Add(new Notice
+            {
+                Key = "character",
+                Heading = "LEVEL UP",
+                Title = string.IsNullOrEmpty(playerName) ? "Character" : playerName,
+                Level = level,
+                Previous = Math.Max(0, previous),
+                Accent = Gold,
+                Chevron = true,
+            });
+        }
+
+        private void Add(Notice notice)
+        {
+            var pending = queue.FirstOrDefault(n => n.Key == notice.Key);
+            if (pending != null) { pending.Level = Math.Max(pending.Level, notice.Level); return; }
             if (queue.Count >= 32) queue.RemoveAt(0);
-            queue.Add(new Notice { Skill = skill, Level = level, Previous = previous < 0 ? Math.Max(0, level - 1) : previous });
+            queue.Add(notice);
+        }
+
+        // 0..1 progress of the number roll. Back may overshoot slightly above 1.
+        private static float EaseRoll(NumberEasing easing, float t)
+        {
+            t = Mathf.Clamp01(t);
+            switch (easing)
+            {
+                case NumberEasing.Smooth:
+                    return Mathf.SmoothStep(0, 1, t);
+                case NumberEasing.Back:
+                    const float c1 = 1.70158f, c3 = c1 + 1;
+                    float u = t - 1;
+                    return 1 + c3 * u * u * u + c1 * u * u;
+                default:
+                    return t >= 1 ? 1 : 1 - Mathf.Pow(2, -10 * t);
+            }
         }
 
         private void Update()
@@ -294,13 +438,15 @@ namespace NewLvlUpEffect
                 queue.RemoveAt(0);
                 elapsed = 0;
                 layoutLogged = false;
-                heading.text = Localization.instance.Localize("$msg_skillup").ToUpperInvariant();
-                title.text = Localization.instance.Localize("$skill_" + current.Skill.ToString().ToLowerInvariant());
+                heading.text = current.Heading;
+                heading.color = current.Accent;
+                title.text = current.Title;
                 number.text = current.Level.ToString();
+                number.color = current.Accent;
                 subtitle.text = current.Previous.ToString();
-                var skill = Player.m_localPlayer.GetSkills().m_skills.FirstOrDefault(s => s.m_skill == current.Skill);
-                icon.sprite = skill == null ? null : skill.m_icon;
+                icon.sprite = current.Icon;
                 icon.enabled = icon.sprite != null;
+                chevron.gameObject.SetActive(current.Chevron && icon.sprite == null);
             }
             elapsed += Time.unscaledDeltaTime;
             float duration = plugin.Duration.Value;
@@ -310,16 +456,20 @@ namespace NewLvlUpEffect
             // Hold the old value briefly, then replace it in the same slot.
             // The transition also fits the shortest configurable notification.
             float rollStart = Mathf.Min(.75f, duration * .28f);
-            float rollDuration = Mathf.Min(.42f, duration * .22f);
-            float roll = Mathf.SmoothStep(0, 1, Mathf.Clamp01((elapsed - rollStart) / rollDuration));
+            var easing = plugin.Easing.Value;
+            // Exponential front-loads the motion, so give its soft tail a little more time.
+            float rollDuration = easing == NumberEasing.Exponential ? Mathf.Min(.6f, duration * .26f) : Mathf.Min(.42f, duration * .22f);
+            float progress = Mathf.Clamp01((elapsed - rollStart) / rollDuration);
+            float roll = EaseRoll(easing, progress);
+            float fade = Mathf.Clamp01(roll);
             subtitle.rectTransform.anchoredPosition = new Vector2(0, 38 * roll);
             number.rectTransform.anchoredPosition = new Vector2(0, -38 * (1 - roll));
-            subtitle.alpha = 1 - roll;
-            number.alpha = roll;
+            subtitle.alpha = 1 - fade;
+            number.alpha = fade;
             float settle = Mathf.Clamp01((elapsed - rollStart - rollDuration) / .45f);
-            float accent = roll >= 1 ? Mathf.Sin(settle * Mathf.PI) : 0;
+            float accent = progress >= 1 ? Mathf.Sin(settle * Mathf.PI) : 0;
             number.rectTransform.localScale = Vector3.one * (1 + .08f * accent);
-            levelGlow.color = new Color(Gold.r, Gold.g, Gold.b, .22f * accent);
+            levelGlow.color = new Color(current.Accent.r, current.Accent.g, current.Accent.b, .22f * accent);
             group.alpha = Mathf.Min(Mathf.SmoothStep(0, 1, enter), leave);
             crest.alpha = Mathf.Clamp01(elapsed / .32f);
             words.alpha = Mathf.SmoothStep(0, 1, Mathf.Clamp01((elapsed - .18f) / .45f));
@@ -349,17 +499,17 @@ namespace NewLvlUpEffect
             {
                 layoutLogged = true;
                 var canvas = GetComponent<Canvas>();
-                plugin.LogLayout("Showing " + current.Skill + ": rootCanvas=" + canvas.isRootCanvas +
+                plugin.LogLayout("Showing " + current.Key + ": rootCanvas=" + canvas.isRootCanvas +
                     ", canvasRect=" + ((RectTransform)transform).rect.size + ", scale=" + card.localScale.x +
                     ", alpha=" + group.alpha + ", active=" + gameObject.activeInHierarchy);
             }
             if (elapsed >= duration) { current = null; group.alpha = 0; }
         }
 
-        private static void Stroke(Transform parent, Vector2 from, Vector2 to, float alpha)
+        private static void Stroke(Transform parent, Vector2 from, Vector2 to, float alpha, float thickness = 1)
         {
             Vector2 delta = to - from;
-            var line = Box("Engraved stroke", parent, new Vector2(delta.magnitude, 1), (from + to) * .5f, new Color(Gold.r, Gold.g, Gold.b, alpha));
+            var line = Box("Engraved stroke", parent, new Vector2(delta.magnitude, thickness), (from + to) * .5f, new Color(Gold.r, Gold.g, Gold.b, alpha));
             line.rectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
         }
 
