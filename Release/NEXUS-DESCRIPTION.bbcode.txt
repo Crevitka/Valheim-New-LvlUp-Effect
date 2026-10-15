@@ -1,6 +1,6 @@
 [center][size=6][b]New LvlUp Effect[/b][/size]
 [size=3]Minimal Nordic skill notifications for Valheim[/size]
-By Crevitka • Version 1.3.0[/center]
+By Crevitka • Version 1.3.1[/center]
 
 [center][img]https://raw.githubusercontent.com/Crevitka/Valheim-New-LvlUp-Effect/master/docs/levelup.gif[/img]
 
@@ -19,7 +19,7 @@ The old level slides up and the new number rises into its place with a subtle go
 [*]Queued notifications for multiple increases.
 [*]Support for normal skill gains and the raiseskill console command.
 [*]Preview command without changing your character.
-[*]Works with FortifySkillsRedux (fortified level-ups) and BetterUI by Zenox (character level-ups).
+[*]Works with FortifySkillsRedux (fortified level-ups, shown in frost blue) and BetterUI by Zenox (character level-ups).
 [/list]
 
 [size=4][b]Requirements[/b][/size]

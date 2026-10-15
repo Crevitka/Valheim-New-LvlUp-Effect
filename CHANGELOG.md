@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- FORTIFIED notifications are now fully frost-blue: the medallion rings, ornament, embers, glow and light bloom follow the accent colour instead of staying gold, so fortified level-ups are recognisable at a glance.
+
 ## 1.3.0
 
 - Fix TextMeshPro font warnings in the log: the notification is now built while inactive and every label gets the game font before TextMeshPro starts, so it no longer looks for the missing default LiberationSans SDF asset.

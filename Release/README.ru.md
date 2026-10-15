@@ -1,4 +1,4 @@
-# New LvlUp Effect — 1.3.0
+# New LvlUp Effect — 1.3.1
 
 Автор: **Crevitka**. Лицензия: **MIT**.
 
@@ -53,9 +53,9 @@ newlvlupeffect_preview character
 
 ## Совместимость
 
-Поддерживаются FortifySkillsRedux (укреплённые уровни с пометкой FORTIFIED) и уровень персонажа из BetterUI от Zenox (LEVEL UP). Другие моды уведомлений могут дублировать сообщения. Старые версии игры, Linux, Steam Deck и нестандартные системы навыков не проверены. Обычный вывод `raiseskill` сохранён.
+Поддерживаются FortifySkillsRedux (укреплённые уровни с пометкой FORTIFIED в синем оформлении) и уровень персонажа из BetterUI от Zenox (LEVEL UP). Другие моды уведомлений могут дублировать сообщения. Старые версии игры, Linux, Steam Deck и нестандартные системы навыков не проверены. Обычный вывод `raiseskill` сохранён.
 
-Для диагностики смотри `BepInEx/LogOutput.log`: сообщения `Loading [New LvlUp Effect 1.3.0]`, `Queued raiseskill notification` и `Showing`. Перед отправкой журнала убери личные данные.
+Для диагностики смотри `BepInEx/LogOutput.log`: сообщения `Loading [New LvlUp Effect 1.3.1]`, `Queued raiseskill notification` и `Showing`. Перед отправкой журнала убери личные данные.
 
 Для обновления закрой игру и замени DLL. Для удаления убери DLL или удали мод через менеджер. Настройки при обновлении сохраняются.
 

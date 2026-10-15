@@ -12,14 +12,14 @@ using UnityEngine.UI;
 [assembly: System.Reflection.AssemblyDescription("Minimal Nordic skill level notifications for Valheim")]
 [assembly: System.Reflection.AssemblyCompany("Crevitka")]
 [assembly: System.Reflection.AssemblyCopyright("Copyright (c) 2026 Crevitka")]
-[assembly: System.Reflection.AssemblyVersion("1.3.0.0")]
-[assembly: System.Reflection.AssemblyFileVersion("1.3.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.3.1.0")]
+[assembly: System.Reflection.AssemblyFileVersion("1.3.1.0")]
 
 namespace NewLvlUpEffect
 {
     public enum NumberEasing { Exponential, Smooth, Back }
 
-    [BepInPlugin(Id, "New LvlUp Effect", "1.3.0")]
+    [BepInPlugin(Id, "New LvlUp Effect", "1.3.1")]
     public sealed class Plugin : BaseUnityPlugin
     {
         public const string Id = "local.valheim.newlvlupeffect";
@@ -59,7 +59,7 @@ namespace NewLvlUpEffect
                 else
                     view.Enqueue(Skills.SkillType.Run, 6, 5);
             }));
-            Logger.LogInfo("New LvlUp Effect 1.3.0 ready (animated level replacement).");
+            Logger.LogInfo("New LvlUp Effect 1.3.1 ready (animated level replacement).");
         }
 
         private bool EnsureView()
@@ -248,10 +248,37 @@ namespace NewLvlUpEffect
             public string Key, Heading, Title;
             public Sprite Icon;
             public int Level, Previous;
-            public Color Accent;
+            public Theme Theme;
             public bool Chevron;
         }
-        private static readonly Color Frost = new Color(.62f, .84f, 1f);
+
+        // Colour set for one notification style. Every gold element is tinted from it,
+        // so a FORTIFIED notice is frost-blue as a whole, not only in its text.
+        private sealed class Theme
+        {
+            public Color Accent, Glow, Light, Text, Dim, Icon;
+        }
+        private static readonly Theme GoldTheme = new Theme
+        {
+            Accent = new Color(.94f, .76f, .44f),
+            Glow = new Color(.86f, .48f, .12f),
+            Light = new Color(1, .87f, .55f),
+            Text = new Color(1f, .96f, .84f),
+            Dim = new Color(.78f, .76f, .68f),
+            Icon = new Color(1, .94f, .8f),
+        };
+        private static readonly Theme FrostTheme = new Theme
+        {
+            Accent = new Color(.62f, .84f, 1f),
+            Glow = new Color(.2f, .52f, .95f),
+            Light = new Color(.72f, .9f, 1f),
+            Text = new Color(.9f, .96f, 1f),
+            Dim = new Color(.66f, .74f, .82f),
+            Icon = new Color(.86f, .94f, 1f),
+        };
+        // Accent-tinted graphics and the alpha each one was designed with.
+        private readonly List<KeyValuePair<Image, float>> tinted = new List<KeyValuePair<Image, float>>();
+        private Theme applied;
         private readonly List<Notice> queue = new List<Notice>();
         private readonly List<Image> sparks = new List<Image>();
         private readonly List<Sprite> ownedSprites = new List<Sprite>();
@@ -265,7 +292,7 @@ namespace NewLvlUpEffect
         private Notice current;
         private float elapsed;
         private bool layoutLogged;
-        private static readonly Color Gold = new Color(.94f, .76f, .44f);
+        private static readonly Color Gold = GoldTheme.Accent;
 
         public void Build(TMP_FontAsset gameFont, Plugin settings)
         {
@@ -302,14 +329,14 @@ namespace NewLvlUpEffect
             crest = medallion.gameObject.AddComponent<CanvasGroup>();
             var disc = Box("Smoked centre", medallion, new Vector2(82, 82), Vector2.zero, new Color(.035f, .04f, .04f, .95f));
             disc.sprite = soft;
-            var outer = Box("Outer engraved ring", medallion, new Vector2(76, 76), Vector2.zero, new Color(Gold.r, Gold.g, Gold.b, .7f));
+            var outer = Tint(Box("Outer engraved ring", medallion, new Vector2(76, 76), Vector2.zero, new Color(Gold.r, Gold.g, Gold.b, .7f)));
             outer.sprite = ring;
-            var inner = Box("Inner engraved ring", medallion, new Vector2(66, 66), Vector2.zero, new Color(Gold.r, Gold.g, Gold.b, .22f));
+            var inner = Tint(Box("Inner engraved ring", medallion, new Vector2(66, 66), Vector2.zero, new Color(Gold.r, Gold.g, Gold.b, .22f)));
             inner.sprite = ring;
             for (int i = 0; i < 4; i++)
             {
                 float angle = i * Mathf.PI * .5f;
-                var marker = Box("Compass engraving", medallion, new Vector2(4, 4), new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 38, Gold);
+                var marker = Tint(Box("Compass engraving", medallion, new Vector2(4, 4), new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 38, Gold));
                 marker.rectTransform.localRotation = Quaternion.Euler(0, 0, 45);
             }
             icon = Box("Skill icon", medallion, new Vector2(45, 45), Vector2.zero, new Color(1, .94f, .8f));
@@ -330,7 +357,7 @@ namespace NewLvlUpEffect
                 for (int i = 0; i < 22; i++)
                 {
                     float fade = 1f - i / 22f;
-                    Box("Gold stroke", ornament, new Vector2(6.5f, 1), new Vector2(side * (58 + i * 6.5f), 0), new Color(Gold.r, Gold.g, Gold.b, .55f * fade));
+                    Tint(Box("Gold stroke", ornament, new Vector2(6.5f, 1), new Vector2(side * (58 + i * 6.5f), 0), new Color(Gold.r, Gold.g, Gold.b, .55f * fade)));
                 }
                 Stroke(ornament, new Vector2(side * 76, 0), new Vector2(side * 87, 6), .8f);
                 Stroke(ornament, new Vector2(side * 87, 6), new Vector2(side * 101, 0), .8f);
@@ -368,7 +395,7 @@ namespace NewLvlUpEffect
                 Icon = Plugin.SkillIcon(skill),
                 Level = level,
                 Previous = previous < 0 ? Math.Max(0, level - 1) : previous,
-                Accent = Gold,
+                Theme = GoldTheme,
             });
         }
 
@@ -384,7 +411,7 @@ namespace NewLvlUpEffect
                 Icon = skillIcon,
                 Level = level,
                 Previous = Math.Max(0, level - 1),
-                Accent = Frost,
+                Theme = FrostTheme,
             });
         }
 
@@ -397,7 +424,7 @@ namespace NewLvlUpEffect
                 Title = string.IsNullOrEmpty(playerName) ? "Character" : playerName,
                 Level = level,
                 Previous = Math.Max(0, previous),
-                Accent = Gold,
+                Theme = GoldTheme,
                 Chevron = true,
             });
         }
@@ -438,11 +465,10 @@ namespace NewLvlUpEffect
                 queue.RemoveAt(0);
                 elapsed = 0;
                 layoutLogged = false;
+                ApplyTheme(current.Theme);
                 heading.text = current.Heading;
-                heading.color = current.Accent;
                 title.text = current.Title;
                 number.text = current.Level.ToString();
-                number.color = current.Accent;
                 subtitle.text = current.Previous.ToString();
                 icon.sprite = current.Icon;
                 icon.enabled = icon.sprite != null;
@@ -469,7 +495,8 @@ namespace NewLvlUpEffect
             float settle = Mathf.Clamp01((elapsed - rollStart - rollDuration) / .45f);
             float accent = progress >= 1 ? Mathf.Sin(settle * Mathf.PI) : 0;
             number.rectTransform.localScale = Vector3.one * (1 + .08f * accent);
-            levelGlow.color = new Color(current.Accent.r, current.Accent.g, current.Accent.b, .22f * accent);
+            var theme = current.Theme;
+            levelGlow.color = new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, .22f * accent);
             group.alpha = Mathf.Min(Mathf.SmoothStep(0, 1, enter), leave);
             crest.alpha = Mathf.Clamp01(elapsed / .32f);
             words.alpha = Mathf.SmoothStep(0, 1, Mathf.Clamp01((elapsed - .18f) / .45f));
@@ -486,14 +513,14 @@ namespace NewLvlUpEffect
             ornament.localScale = new Vector3(ease, 1, 1);
             words.transform.localPosition = new Vector3(0, -8 * (1 - ease), 0);
             float pulse = Mathf.Exp(-Mathf.Pow((elapsed - .38f) / .22f, 2));
-            halo.color = new Color(.86f, .48f, .12f, .12f + .12f * pulse);
-            flare.color = new Color(1, .87f, .55f, pulse * .6f);
+            halo.color = new Color(theme.Glow.r, theme.Glow.g, theme.Glow.b, .12f + .12f * pulse);
+            flare.color = new Color(theme.Light.r, theme.Light.g, theme.Light.b, pulse * .6f);
             for (int i = 0; i < sparks.Count; i++)
             {
                 float phase = Mathf.Clamp01((elapsed - (i % 4) * .12f) / (1.4f + (i % 3) * .3f));
                 float x = (i % 2 == 0 ? -1 : 1) * (50 + (i * 37 % 155));
                 sparks[i].rectTransform.anchoredPosition = new Vector2(x + Mathf.Sin(i * 2f + phase) * 12, 54 + phase * (40 + i % 4 * 10));
-                sparks[i].color = new Color(Gold.r, Gold.g, Gold.b, Mathf.Sin(phase * Mathf.PI) * .65f);
+                sparks[i].color = new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, Mathf.Sin(phase * Mathf.PI) * .65f);
             }
             if (!layoutLogged && elapsed >= .7f)
             {
@@ -506,10 +533,29 @@ namespace NewLvlUpEffect
             if (elapsed >= duration) { current = null; group.alpha = 0; }
         }
 
-        private static void Stroke(Transform parent, Vector2 from, Vector2 to, float alpha, float thickness = 1)
+        private Image Tint(Image image)
+        {
+            tinted.Add(new KeyValuePair<Image, float>(image, image.color.a));
+            return image;
+        }
+
+        private void ApplyTheme(Theme theme)
+        {
+            if (applied == theme) return;
+            applied = theme;
+            foreach (var pair in tinted)
+                pair.Key.color = new Color(theme.Accent.r, theme.Accent.g, theme.Accent.b, pair.Value);
+            heading.color = theme.Accent;
+            number.color = theme.Accent;
+            title.color = theme.Text;
+            subtitle.color = theme.Dim;
+            icon.color = theme.Icon;
+        }
+
+        private void Stroke(Transform parent, Vector2 from, Vector2 to, float alpha, float thickness = 1)
         {
             Vector2 delta = to - from;
-            var line = Box("Engraved stroke", parent, new Vector2(delta.magnitude, thickness), (from + to) * .5f, new Color(Gold.r, Gold.g, Gold.b, alpha));
+            var line = Tint(Box("Engraved stroke", parent, new Vector2(delta.magnitude, thickness), (from + to) * .5f, new Color(Gold.r, Gold.g, Gold.b, alpha)));
             line.rectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
         }
 
