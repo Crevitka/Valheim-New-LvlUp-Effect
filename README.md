@@ -12,6 +12,12 @@ New LvlUp Effect replaces Valheim's standard skill-increase text with a compact 
 
 ![Vanilla skill-up text next to the New LvlUp Effect notification](docs/before-after.jpg)
 
+## FortifySkillsRedux
+
+Fortified level-ups from FortifySkillsRedux get their own frost-blue style:
+
+![FORTIFIED notification in frost blue](docs/fortified.png)
+
 Downloads: [GitHub Releases](https://github.com/Crevitka/Valheim-New-LvlUp-Effect/releases). Russian README: [Release/README.ru.md](Release/README.ru.md).
 
 ## Features
